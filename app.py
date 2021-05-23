@@ -1,9 +1,6 @@
 import os
-from flask import Flask, flash, request, redirect, url_for, session, send_from_directory
-from werkzeug.utils import secure_filename
-# from flask_cors import CORS, cross_origin
+from flask import Flask, flash, request
 import logging
-from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS  # comment this on deployment
 
 import numpy as np
@@ -12,7 +9,7 @@ import tensorflow as tf
 
 UPLOAD_FOLDER = 'images'
 
-app = Flask(__name__, static_url_path='', static_folder='frontend/build')
+app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = os.urandom(24)
 CORS(app)  # comment this on deployment
@@ -36,20 +33,15 @@ tflite_interpreter5 = tf.lite.Interpreter(
 input_details = tflite_interpreter5.get_input_details()
 output_details = tflite_interpreter5.get_output_details()
 
-print("== Input details ==")
-print("name:", input_details[0]['name'])
-print("shape:", input_details[0]['shape'])
-print("type:", input_details[0]['dtype'])
+# print("== Input details ==")
+# print("name:", input_details[0]['name'])
+# print("shape:", input_details[0]['shape'])
+# print("type:", input_details[0]['dtype'])
 
-print("\n== Output details ==")
-print("name:", output_details[0]['name'])
-print("shape:", output_details[0]['shape'])
-print("type:", output_details[0]['dtype'])
-
-
-@app.route("/", defaults={'path': ''})
-def serve(path):
-    return send_from_directory(app.static_folder, 'index.html')
+# print("\n== Output details ==")
+# print("name:", output_details[0]['name'])
+# print("shape:", output_details[0]['shape'])
+# print("type:", output_details[0]['dtype'])
 
 
 @app.route('/upload', methods=['POST'])
@@ -74,9 +66,7 @@ def upload_file():
 
         tflite_interpreter1.allocate_tensors()
         tflite_interpreter1.set_tensor(input_details[0]['index'], image)
-
         tflite_interpreter1.invoke()
-
         tflite_model_predictions = tflite_interpreter1.get_tensor(
             output_details[0]['index'])
         print("Prediction results :", tflite_model_predictions)
@@ -85,9 +75,7 @@ def upload_file():
 
         tflite_interpreter2.allocate_tensors()
         tflite_interpreter2.set_tensor(input_details[0]['index'], image)
-
         tflite_interpreter2.invoke()
-
         tflite_model_predictions = tflite_interpreter2.get_tensor(
             output_details[0]['index'])
         print("Prediction results :", tflite_model_predictions)
@@ -96,9 +84,7 @@ def upload_file():
 
         tflite_interpreter3.allocate_tensors()
         tflite_interpreter3.set_tensor(input_details[0]['index'], image)
-
         tflite_interpreter3.invoke()
-
         tflite_model_predictions = tflite_interpreter3.get_tensor(
             output_details[0]['index'])
         print("Prediction results :", tflite_model_predictions)
@@ -107,9 +93,7 @@ def upload_file():
 
         tflite_interpreter4.allocate_tensors()
         tflite_interpreter4.set_tensor(input_details[0]['index'], image)
-
         tflite_interpreter4.invoke()
-
         tflite_model_predictions = tflite_interpreter4.get_tensor(
             output_details[0]['index'])
         print("Prediction results :", tflite_model_predictions)
@@ -118,17 +102,16 @@ def upload_file():
 
         tflite_interpreter5.allocate_tensors()
         tflite_interpreter5.set_tensor(input_details[0]['index'], image)
-
         tflite_interpreter5.invoke()
-
         tflite_model_predictions = tflite_interpreter5.get_tensor(
             output_details[0]['index'])
         print("Prediction results :", tflite_model_predictions)
         val = val + tflite_model_predictions[0][0]
         listofpreds.append(tflite_model_predictions[0][0])
 
-        print(val / 5)
+        val = val/5
+        print(val)
         if os.path.exists(path):
             os.remove(path)
 
-        return str(listofpreds)
+        return str(val)
