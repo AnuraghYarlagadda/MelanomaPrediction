@@ -1,5 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import axios from 'axios'
+
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Card,
+  CardImg,
+  CardText,
+  CardBody,
+  CardTitle,
+  CardSubtitle,
+} from 'reactstrap'
 
 const Main = () => {
   const [uploadInput, setuploadInput] = useState('')
@@ -13,21 +26,40 @@ const Main = () => {
       console.log(res)
     })
   }
+
   return (
-    <form onSubmit={handleUploadImage}>
-      <div>
-        <input
-          ref={(ref) => {
-            setuploadInput(ref)
-          }}
-          type='file'
-        />
-      </div>
-      <br />
-      <div>
-        <button>Upload</button>
-      </div>
-    </form>
+    <Fragment>
+      <Container>
+        <Row>
+          <Col sm='3'></Col>
+          <Col sm='6'>
+            <div className='text-center'>
+              <Card>
+                <CardBody>
+                  <form onSubmit={handleUploadImage}>
+                    <div>
+                      <input
+                        ref={(ref) => {
+                          setuploadInput(ref)
+                        }}
+                        type='file'
+                      />
+                    </div>
+                    <br />
+                    <div>
+                      <Button variant='contained' color='primary'>
+                        Upload
+                      </Button>
+                    </div>
+                  </form>
+                </CardBody>
+              </Card>
+            </div>
+          </Col>
+          <Col sm='3'></Col>
+        </Row>
+      </Container>
+    </Fragment>
   )
 }
 
