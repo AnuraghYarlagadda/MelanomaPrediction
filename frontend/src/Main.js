@@ -13,6 +13,7 @@ import {
   CardTitle,
   CardSubtitle,
   UncontrolledAlert,
+  Table,
 } from 'reactstrap'
 
 import { useFormik } from 'formik'
@@ -30,6 +31,8 @@ import 'react-toastify/dist/ReactToastify.css'
 
 import { useDropzone } from 'react-dropzone'
 import { AiFillFileImage } from 'react-icons/ai'
+
+import jsPDF from 'jspdf'
 
 const useStyles = makeStyles((theme) => ({
   margin: {
@@ -52,6 +55,8 @@ const Main = () => {
   const [name, setName] = useState(null)
   const [medicalID, setMedicalID] = useState(null)
   const [prediction, setPrediction] = useState(null)
+
+  var doc = new jsPDF('p', 'mm', [200, 200])
 
   const onDrop = useCallback(async (acceptedFiles) => {
     if (acceptedFiles.length === 1) {
@@ -228,10 +233,12 @@ const Main = () => {
                         {name && medicalID && file && (
                           <div>
                             <h6 className='mt-3'>{`Name: ${name}`}</h6>
-                            <h6 className='mt-1'>{`Medical ID: ${medicalID}`}</h6>
-                            <h6 className='mt-1'>{`Choosen Image: ${file.name}`}</h6>
+                            <h6 className='mt-2'>{`Medical ID: ${medicalID}`}</h6>
+                            <h6 className='mt-2'>{`Choosen Image: ${file.name}`}</h6>
                             {prediction && (
-                              <h6 className='mt-1'>{`Prediction: ${prediction}`}</h6>
+                              <h6 className='mt-2'>{`Prediction: ${(
+                                prediction * 100
+                              ).toFixed(2)} %`}</h6>
                             )}
                           </div>
                         )}
@@ -253,20 +260,71 @@ const Main = () => {
                       {loading ? (
                         <CircularProgress color='secondary' />
                       ) : (
-                        <Button
-                          variant='contained'
-                          color='dark'
-                          onClick={() => {
-                            toggleForm(true)
-                            setFile(null)
-                            setName(null)
-                            setMedicalID(null)
-                            setPrediction(null)
-                            setImageSource(null)
-                          }}
-                        >
-                          Predict Another
-                        </Button>
+                        <Row>
+                          <Col sm='6'>
+                            <Button
+                              variant='contained'
+                              color='success'
+                              onClick={() => {
+                                var img = new Image()
+                                img.src =
+                                  process.env.PUBLIC_URL + '/background.jpg'
+
+                                doc.rect('2', '2', '196', '196')
+                                doc.addImage(img, 'jpeg', 3, 3, 194, 25)
+
+                                doc.rect('15', '35', '170', '75')
+                                doc.setFont('Times-Roman', 'italic')
+                                doc.setTextColor(0, 77, 153)
+                                doc.text('Name ', 30, 55)
+                                doc.text('Medical ID ', 30, 65)
+                                doc.text('Prediction ', 30, 75)
+
+                                doc.setFont('Times-Roman', 'normal')
+                                doc.setTextColor(0, 0, 0)
+                                doc.text(`: ${name} `, 60, 55)
+                                doc.text(`: ${medicalID} `, 60, 65)
+                                doc.text(
+                                  `: ${(prediction * 100).toFixed(2)} %`,
+                                  60,
+                                  75
+                                )
+
+                                doc.addImage(
+                                  imageSource,
+                                  'jpeg',
+                                  125,
+                                  45,
+                                  50,
+                                  50
+                                )
+                                doc.setFont('Times-Roman', 'normal')
+                                // doc.setTextColor(0, 102, 82)
+                                doc.text(`${file.name}`, 130, 100)
+
+                                doc.save(`${medicalID}.pdf`)
+                              }}
+                            >
+                              Download Report
+                            </Button>
+                          </Col>
+                          <Col sm='6'>
+                            <Button
+                              variant='contained'
+                              color='danger'
+                              onClick={() => {
+                                toggleForm(true)
+                                setFile(null)
+                                setName(null)
+                                setMedicalID(null)
+                                setPrediction(null)
+                                setImageSource(null)
+                              }}
+                            >
+                              Predict Another
+                            </Button>
+                          </Col>
+                        </Row>
                       )}
                     </div>
                   </CardBody>
@@ -276,6 +334,41 @@ const Main = () => {
             </Row>
           )}
         </Fragment>
+        {/* <Button
+          variant='contained'
+          color='info'
+          onClick={() => {
+            var img = new Image()
+            var source = window.document.getElementById('forPdf')
+            img.src = process.env.PUBLIC_URL + '/background.jpg'
+            doc.rect('2', '2', '196', '196')
+            doc.addImage(img, 'png', 3, 3, 194, 25)
+
+            doc.rect('15', '35', '170', '75')
+            doc.setFont('Times-Roman', 'italic')
+            doc.setTextColor(0, 77, 153)
+            doc.text('Name ', 30, 55)
+            doc.text('Medical ID ', 30, 65)
+            doc.text('Name ', 30, 75)
+            doc.text('Medical ID ', 30, 85)
+
+            doc.setFont('Times-Roman', 'normal')
+            doc.setTextColor(0, 0, 0)
+            doc.text(': Anuragh ', 60, 55)
+            doc.text(': ISIC_6873268623 ', 60, 65)
+            doc.text(': Anuragh ', 60, 75)
+            doc.text(': ISIC_6873268623 ', 60, 85)
+
+            doc.addImage(img, 'png', 125, 45, 50, 50)
+            doc.setFont('Times-Roman', 'normal')
+            // doc.setTextColor(0, 102, 82)
+            doc.text('ISIC_6873268623 ', 130, 100)
+
+            doc.save('demo.pdf')
+          }}
+        >
+          Download Report
+        </Button> */}
       </Container>
     </Fragment>
   )
