@@ -56,8 +56,6 @@ const Main = () => {
   const [medicalID, setMedicalID] = useState(null)
   const [prediction, setPrediction] = useState(null)
 
-  var doc = new jsPDF('p', 'mm', [200, 200])
-
   const onDrop = useCallback(async (acceptedFiles) => {
     if (acceptedFiles.length === 1) {
       setFile(acceptedFiles[0])
@@ -266,12 +264,13 @@ const Main = () => {
                               variant='contained'
                               color='success'
                               onClick={() => {
+                                var doc = new jsPDF()
                                 var img = new Image()
                                 img.src =
                                   process.env.PUBLIC_URL + '/background.jpg'
 
-                                doc.rect('2', '2', '196', '196')
-                                doc.addImage(img, 'jpeg', 3, 3, 194, 25)
+                                doc.rect('2', '2', '206', '205')
+                                doc.addImage(img, 'jpeg', 3, 3, 204, 25)
 
                                 doc.rect('15', '35', '170', '75')
                                 doc.setFont('Times-Roman', 'italic')
